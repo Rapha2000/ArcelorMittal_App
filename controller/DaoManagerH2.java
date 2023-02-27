@@ -35,9 +35,9 @@ public class DaoManagerH2 {
     }
     
     /**
-	 * Méthode qui permet de savoir si un utilisateur existe dans la bdd
-	 */
-	public boolean userExists(String username) {
+    * Méthode qui permet de savoir si un utilisateur existe dans la bdd
+    */
+    public boolean userExists(String username) {
 		
 		boolean exists = false;
 		
@@ -57,9 +57,9 @@ public class DaoManagerH2 {
 		return exists;
 	}
 	
-	/**
-	 * Méthode qui permet d'ajouter un user à la bdd s'il n'existe pas déjà
-	 */
+    /**
+    * Méthode qui permet d'ajouter un user à la bdd s'il n'existe pas déjà
+    */
     public void ajouterUser(String username, String password, boolean isAdmin) {
     	try {
     		if (!userExists(username)) {
