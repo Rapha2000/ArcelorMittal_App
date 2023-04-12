@@ -44,13 +44,13 @@ private ConnectionBDD (){
 		
 
         // Création d'une table "users"
-        String createTableQuery = "CREATE TABLE IF NOT EXISTS USERS (id INT PRIMARY KEY, name VARCHAR, password VARCHAR)";
+        String createTableQuery = "CREATE TABLE IF NOT EXISTS USERS (name VARCHAR PRIMARY KEY, password VARCHAR, id INTEGER)";
         Statement stmt = conn.createStatement();
         stmt.execute(createTableQuery);
 
         // Fermeture de la connexion à la base de données H2
-        conn.close();}
-		
+        //conn.close();}
+		}
         catch (SQLException e) {
 			// TODO Auto-generated catch block
         	System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -231,7 +231,7 @@ private ConnectionBDD (){
 	public ArrayList<Users> recupererUtilisateurs() {
 		ArrayList<Users> listeUtilisateurs = new ArrayList<>();
 		try {
-			String request = "SELECT username, admin FROM USERS";
+			String request = "SELECT NAME, ID FROM USERS";
 			Statement statement = conn.createStatement();
 			if (statement.execute(request)) {
 				ResultSet resultSet = statement.getResultSet();
@@ -254,13 +254,13 @@ private ConnectionBDD (){
 	public Users existenceEtRole(String username, String password) { // 1 admin 0 user -1 n'existe pas
 		int id = -1;
 		try {
-			String request = "SELECT * FROM USER WHERE NAME = ?  AND password = ?" ;
+			String request = "SELECT * FROM USERS WHERE NAME = ?  AND password = ?" ;
 			PreparedStatement preparedStatement = conn.prepareStatement(request); // protection injection SQK
 			preparedStatement.setString(1, username);
 			preparedStatement.setString(2, password);
 			ResultSet resultSet = preparedStatement.executeQuery(); //résultat de la requête 
 			while (resultSet.next()) {
-				if (resultSet.getBoolean("admin"))
+				if (resultSet.getBoolean("ID"))
 					id = 1;
 				else
 					id = 0;
@@ -279,7 +279,7 @@ private ConnectionBDD (){
 public boolean utilisateurExiste(String username) {
 	boolean existence = false;
 	try {
-		String request = "SELECT * FROM USER WHERE NAME = ?";
+		String request = "SELECT * FROM USERS WHERE NAME = ?";
 		PreparedStatement preparedStatement = conn.prepareStatement(request); // protection injection SQK
 		preparedStatement.setString(1, username);
 		ResultSet resultSet = preparedStatement.executeQuery();
@@ -299,7 +299,7 @@ public boolean utilisateurExiste(String username) {
 public boolean supprimerUtilisateur(String username) {
 	boolean utilisateurSupprime = false;
 	try {
-		String request = "DELETE FROM USER WHERE username = ?";
+		String request = "DELETE FROM USERS WHERE NAME = ?";
 		PreparedStatement preparedStatement = conn.prepareStatement(request); // protection injection SQK
 		preparedStatement.setString(1, username);
 		preparedStatement.execute();
@@ -318,7 +318,7 @@ public boolean supprimerUtilisateur(String username) {
 public boolean creerNouvelUtilisateur(String username, String password, int admin) {
 	try {
 		if (! utilisateurExiste(username)) { //on vérifie que l'utilisateur n'existe pas déjà
-			String request = "INSERT INTO USER (name, password, id) VALUES (? , ? , ?)";
+			String request = "INSERT INTO USERS (name, password, id) VALUES (? , ? , ?)";
 			PreparedStatement preparedStatement = conn.prepareStatement(request); // protection injection SQK
 			preparedStatement.setString(1, username);
 			preparedStatement.setString(2, password);
@@ -336,7 +336,7 @@ public boolean creerNouvelUtilisateur(String username, String password, int admi
  * permet la mise à jour d'un droit pour un utilisateur 
  */
 public boolean miseAJourDroits(String username, int droit) {
-	String request = "UPDATE USER SET id = ? WHERE name = ?";
+	String request = "UPDATE USERS SET id = ? WHERE name = ?";
 	try {
 		PreparedStatement preparedStatement = conn.prepareStatement(request); // protection injection SQK
 		preparedStatement.setInt(1, droit);

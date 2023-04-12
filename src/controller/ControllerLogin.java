@@ -40,23 +40,28 @@ public class ControllerLogin implements EventHandler<ActionEvent>{
 		String password = vue.getPassword();
 		switch (typeBouton) {
 		case "VALIDATE":
-			if (verifyPassword(password) && verifyPassword(utilisateur)) {
+			//if (verifyPassword(password) && verifyPassword(utilisateur)) {
 				System.out.println("valide");
 				Users user = dao.existenceEtRole(utilisateur, password);
 				int login = user.getId();
 				if (login != -1) {
 					System.out.println("User exists in the BDD");
+					System.out.println("login : " + login);
 					switch (login) {
-					case 0: 
-						vue.moveToProcessEng(user);
-					case 1:
-						vue.moveToWorker(user);
-						break;
+						case 1: 
+							vue.moveToProcessEng(user);
+							System.out.println("Ucas 1");
+							break;
+						
+						case 0:
+							vue.moveToWorker(user);
+							System.out.println("Ucas 2");
+							break;
 					default:
 						break;
 					}
 					// connexion OK
-				} else {
+				/*} else {
 					System.out.println("User not founded");
 					vue.setMessageIfProblem("Username and/or Password incorrect");
 				}
@@ -67,8 +72,10 @@ public class ControllerLogin implements EventHandler<ActionEvent>{
 				break;
 			default:
 				break;
-			}
+			}*/
 		}
+		}
+	}
 
 	public void show() { //retirer user
 		//ControllerMenu.utilisateur = user;

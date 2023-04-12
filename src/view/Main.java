@@ -38,17 +38,17 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		
-		ViewProcessEng processEng = ViewProcessEng.getInstanceViewProcessEng();
-		processEng.setViewProcessEng();
-		
 		ViewMenu menu = ViewMenu.getInstanceViewMenu();
 		menu.setViewMenu();
+		
+		/*ViewProcessEng processEng = ViewProcessEng.getInstanceViewProcessEng();
+		processEng.setViewProcessEng();
 		
 		ViewLogin login = ViewLogin.getInstanceViewLogin();
 		login.setViewLogin();
 		
 		ViewWorker worker = ViewWorker.getInstanceViewWorker();
-		worker.setViewWorker();
+		worker.setViewWorker();*/
 	}
 	
 	public void openLogInWindow() {

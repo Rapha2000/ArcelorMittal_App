@@ -80,6 +80,8 @@ public class ViewProcessEng {
 		textFUser = new TextField();
 		passwordF = new PasswordField();
 		
+		checkBoxAdmin = new CheckBox("Admin");
+		
 		buttonUserAdd = new Button("Add");
 		buttonUserAdd.setOnAction(new ControllerProcessEng());
 		buttonUserRemove = new Button("Remove");

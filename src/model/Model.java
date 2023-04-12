@@ -51,7 +51,7 @@ public class Model {
 	 * Constructeur
 	 */
 	private Model(String nomFichier, String nomPoste) {
-		cheminFichierSortieCapteurs = "C:/Users/rapha/OneDrive/Ecole/01 - Cours/S8/04 - Ingénierie logicielle/03 - Projet/workspace/Fichiers/Krakov/";
+		cheminFichierSortieCapteurs = "C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/Krakov/";
 		this.nomFichierSortieCapteurs = nomFichier;
 		pcs = new PropertyChangeSupport(this);
 		this.nomPoste = nomPoste;
@@ -141,7 +141,7 @@ public class Model {
 	
 	public boolean transformerCsv_input_data_en_fichierCSVEntreeOrowan(Csv_input_data data) {
 		try {
-			FileWriter myWriter = new FileWriter("C:/Users/rapha/OneDrive/Ecole/01 - Cours/S8/04 - Ingénierie logicielle/03 - Projet/workspace/Fichiers/sortieOro/" + nomPoste);
+			FileWriter myWriter = new FileWriter("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste);
 			myWriter.write("Cas	He	Hs	Te	Ts	Diam_WR	WRyoung	offset ini	mu_ini	Force	G\n");
 			myWriter.write(data.toStringnoNomPoste().replace(',', '\t'));
 			myWriter.close();
@@ -154,7 +154,7 @@ public class Model {
 	
 	public void runOrowan (Csv_input_data inOrowan) throws IOException, InterruptedException {
 		long start = System.currentTimeMillis();
-		String cmd = "C:\\Users\\rapha\\OneDrive\\Ecole\\01 - Cours\\S8\\04 - Ingénierie logicielle\\03 - Projet\\workspace\\Fichiers\\Model\\Orowan_x64.exe"; // la commande à exec
+		String cmd = "C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/Model/Orowan_x64.exe.exe"; // la commande à exec
 
 		ProcessBuilder processBuilder = new ProcessBuilder(cmd); // Prépare le lancement de CMD avec la ma commande
 
@@ -176,11 +176,11 @@ public class Model {
 			writer.flush();
 
 			// System.out.println("./Rugo/Ressources/orowan/inv_cst.txt\n");
-			writer.writeBytes("C:/Users/rapha/OneDrive/Ecole/01 - Cours/S8/04 - Ingénierie logicielle/03 - Projet/workspace/Fichiers/sortieOro/" + nomPoste + "\n");
+			writer.writeBytes("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste + "\n");
 			writer.flush();
 
 			// System.out.println("./Rugo/Ressources/orowan/output.txt\n");
-			writer.writeBytes("./Rugo/Ressources/orowan/output/" + nomPoste + "\n");
+			writer.writeBytes("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste + "\n");
 			writer.flush();
 
 			process.waitFor();
@@ -201,7 +201,7 @@ public class Model {
 
 		try {
 			String sCurrentLine;
-			br = new BufferedReader(new FileReader("./Rugo/Ressources/orowan/output/" + nomPoste));// file name with
+			br = new BufferedReader(new FileReader("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste));// file name with
 																									// path
 			int flagFirstLine = 1;
 			while ((sCurrentLine = br.readLine()) != null) {
@@ -275,6 +275,17 @@ public class Model {
 		pcs.firePropertyChange("newData", null, null);
 		return (donneeAffichage);
 	}
+	
+	/**
+	 * Lance le thread de la simulation
+	 */
+	/*public void startSimulation() {
+		System.out.println("starting Threads");
+		textFileHandler.get(0).start(); // Reset les tables et lance le remplissage de la bdd
+		textFileHandler.get(1).start(); // Reset les tables et lance le remplissage de la bdd
+		orowan.get(0).start();
+		orowan.get(1).start();
+	}*/
 	
 	
 	public void addPropertyChangeListener(PropertyChangeListener listener) {

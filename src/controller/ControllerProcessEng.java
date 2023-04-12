@@ -86,8 +86,11 @@ public class ControllerProcessEng implements EventHandler<ActionEvent> {
 				}
 				break;
 			case "Update":
+				System.out.println("caca"+ id);
+				//ici
 				if (dao.utilisateurExiste(nomUtilisateur) ){
 					int newId;
+					System.out.println("caca"+ id);
 					if (id == 0)
 						newId = 1;
 					else
