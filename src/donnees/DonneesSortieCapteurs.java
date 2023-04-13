@@ -1,5 +1,8 @@
 package donnees;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 public class DonneesSortieCapteurs {
 	
 	private String nomPoste;
@@ -22,10 +25,10 @@ public class DonneesSortieCapteurs {
 	private double torque;	
 	private double averageSigma;	
 	private double inputError;	
-	private double lubWFlUp;	
-	private double lubWFlLo;	
-	private double lubOilFlUp;	
-	private double lubOilFlLo;	 
+	private double LUBWFLUP;	
+	private double LUBWFLLO;	
+	private double LUBOILFLUP;	
+	private double LUBOILFLLO;	 
 	private double work_roll_speed;
 	
 	
@@ -55,10 +58,10 @@ public class DonneesSortieCapteurs {
 		this.torque = torque;
 		this.averageSigma = averageSigma;
 		this.inputError = inputError;
-		this.lubWFlUp = lubWFlUp;
-		this.lubWFlLo = lubWFlLo;
-		this.lubOilFlUp = lubOilFlUp;
-		this.lubOilFlLo = lubOilFlLo;
+		this.LUBWFLUP = lubWFlUp;
+		this.LUBWFLLO = lubWFlLo;
+		this.LUBOILFLUP = lubOilFlUp;
+		this.LUBOILFLLO = lubOilFlLo;
 		this.work_roll_speed = work_roll_speed;
 		this.nomPoste = nomPoste;
 	}
@@ -387,64 +390,79 @@ public class DonneesSortieCapteurs {
 
 
 
-	public double getLubWFlUp() {
-		return lubWFlUp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public double getLUBWFLUP() {
+		return LUBWFLUP;
 	}
 
 
 
 
 
-	public void setLubWFlUp(double lubWFlUp) {
-		this.lubWFlUp = lubWFlUp;
+	public void setLUBWFLUP(double lUBWFLUP) {
+		LUBWFLUP = lUBWFLUP;
 	}
 
 
 
 
 
-	public double getLubWFlLo() {
-		return lubWFlLo;
+	public double getLUBWFLLO() {
+		return LUBWFLLO;
 	}
 
 
 
 
 
-	public void setLubWFlLo(double lubWFlLo) {
-		this.lubWFlLo = lubWFlLo;
+	public void setLUBWFLLO(double lUBWFLLO) {
+		LUBWFLLO = lUBWFLLO;
 	}
 
 
 
 
 
-	public double getLubOilFlUp() {
-		return lubOilFlUp;
+	public double getLUBOILFLUP() {
+		return LUBOILFLUP;
 	}
 
 
 
 
 
-	public void setLubOilFlUp(double lubOilFlUp) {
-		this.lubOilFlUp = lubOilFlUp;
+	public void setLUBOILFLUP(double lUBOILFLUP) {
+		LUBOILFLUP = lUBOILFLUP;
 	}
 
 
 
 
 
-	public double getLubOilFlLo() {
-		return lubOilFlLo;
+	public double getLUBOILFLLO() {
+		return LUBOILFLLO;
 	}
 
 
 
 
 
-	public void setLubOilFlLo(double lubOilFlLo) {
-		this.lubOilFlLo = lubOilFlLo;
+	public void setLUBOILFLLO(double lUBOILFLLO) {
+		LUBOILFLLO = lUBOILFLLO;
 	}
 
 
@@ -463,6 +481,21 @@ public class DonneesSortieCapteurs {
 		this.work_roll_speed = work_roll_speed;
 	}
 	
+	public String toString() {
+		DecimalFormatSymbols mySymbol = new DecimalFormatSymbols();
+		mySymbol.setDecimalSeparator('.');
+		DecimalFormat df = new DecimalFormat("0.000", mySymbol);
+		return  lp + "," + matID + "," + df.format(xTime) + ", " + df.format(xLoc) + ", "
+				+ df.format(enThick) + ", " + df.format(exThick) + ", " + df.format(enTens) + ", " + df.format(exTens) + ", "
+				+ df.format(rollForce) + ", " + df.format(fSlip) + ", " + df.format(daiameter) + ", "
+				+ df.format(rolledLengthWorkRolls) + ", " + df.format(youngModulus) + ", " + df.format(backuprolldia)
+				+ ", " + df.format(rolledlengthforBackuprolls) + ", " + df.format(mu) + ", " + df.format(torque)
+				+ ", " + df.format(averageSigma) + ", " + df.format(inputError) + ", " + df.format(LUBWFLUP)
+				+ ", " + df.format(LUBWFLLO) + ", " + df.format(LUBOILFLUP) + ", " + df.format(LUBOILFLLO)
+				+ ", " + df.format(work_roll_speed) + ", '" + nomPoste + "'";
+	}
+
 	
 
 }
+
