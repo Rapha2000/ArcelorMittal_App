@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 import controller.ControllerWorker;
 import donnees.Table_donnees_affichage;
 import controller.ControllerMenu;
+import controller.ControllerProcessEng;
 
 public class ViewWorker {
 	
@@ -98,7 +99,7 @@ public class ViewWorker {
 				
 		labelStandID = new Label("Voir le poste : ");
 		comboBoxStandID = new ComboBox<>();
-		comboBoxStandID.setOnMouseClicked(new ControllerWorker());
+		comboBoxStandID.setOnMouseClicked(new ControllerWorker("refresh"));
 		
 		hBoxStandID = new HBox();
 		
@@ -112,12 +113,15 @@ public class ViewWorker {
 		hBox = new HBox();
 		
 		checkBoxFriction = new CheckBox("Friction");
+		checkBoxFriction.setOnMouseClicked(new ControllerWorker());
 		checkBoxRollSpeed = new CheckBox("Roll Speed");
+		checkBoxRollSpeed.setOnMouseClicked(new ControllerWorker());
 		checkBoxSigma = new CheckBox("Sigma");
+		checkBoxSigma.setOnMouseClicked(new ControllerWorker());
 		
 		hBox.getChildren().addAll(checkBoxFriction, checkBoxRollSpeed, checkBoxSigma);
 		
-		vBox.getChildren().addAll(labelStandID, labelComputeTime, computeTimeValue, labelFrictionCoef, frictionCoefValue, hBox);
+		vBox.getChildren().addAll(labelStandID, comboBoxStandID, labelComputeTime, computeTimeValue, labelFrictionCoef, frictionCoefValue, hBox);
 	
 		paneWorker.setLeft(vBox);
 		//paneWorker.setCenter();
@@ -164,10 +168,10 @@ public class ViewWorker {
 		computeTimeValue.setText(computeTimeData + "ms");
 	}
 	
-	public void addAPoste(String listPoste) {
+	public void addAPoste(ArrayList<String> listPoste) {
 		comboBoxStandID.getItems().setAll(listPoste);
 	}
-	
+
 	public boolean isCheckedFriction() {
 		return checkBoxFriction.isSelected();
 	}

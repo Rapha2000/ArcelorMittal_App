@@ -59,23 +59,20 @@ public class ControllerLogin implements EventHandler<ActionEvent>{
 							break;
 					default:
 						break;
-					}
+					}}
 					// connexion OK
-				/*} else {
+				 else {
 					System.out.println("User not founded");
 					vue.setMessageIfProblem("Username and/or Password incorrect");
 				}
-			} else {
-				System.out.println("Username and/or Password incorrect");
-				vue.setMessageIfProblem("Username and/or Password incorrect");
-				}
+				
 				break;
 			default:
 				break;
-			}*/
+			
 		}
 		}
-	}
+
 
 	public void show() { //retirer user
 		//ControllerMenu.utilisateur = user;

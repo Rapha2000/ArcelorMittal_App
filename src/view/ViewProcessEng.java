@@ -124,6 +124,7 @@ public class ViewProcessEng {
 		//Bouton deconnexion
 		buttonLogout = new Button("Logout");
 		paneProcessEng.setRight(buttonLogout);
+		buttonLogout.setOnAction(new ControllerProcessEng());
 		
 		//Message info
 		infoText = new Text();
@@ -159,6 +160,7 @@ public class ViewProcessEng {
 	
 	public void moveToMenu() {
 		controllerMenu = new ControllerMenu();
+		System.out.println("hey");
 		stageProcessEng.close();
 		controllerMenu.show();
 	}

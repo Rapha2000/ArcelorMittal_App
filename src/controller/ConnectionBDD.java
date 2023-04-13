@@ -35,8 +35,8 @@ private ConnectionBDD (){
         // Informations de connexion à la base de données H2
         String jdbcUrl = "jdbc:h2:tcp://localhost/~/test";
         String username = "sa";
-        String password = "password";
-
+        String password = "anaisdespres";
+        
         // Connexion à la base de données H2
        
 		try {
@@ -64,7 +64,10 @@ private ConnectionBDD (){
 	 */
 	
 	public void insererDonneeSortieCapteur(DonneesSortieCapteurs outputDataCapteur) {
-		String request = "ID,LP,MATID,XTIME,XLOC,ENTHICK,EXTHICK,ENTENS,EXTENS,ROLLFORCE,FSLIP,DAIAMETER,ROLLED_LENGTH_FOR_WORK_ROLLS,YOUNGMODULUS,BOCKUP_ROLL_DIA,ROLLED_LENGTH_FOR_BACKUP_ROLLS,MU,TORQUE,AVERAGESIGMA,INPUTERROR,LUBWFLUP,LUBWFLLO,LUBOILFLUP,FLUBOILFLLO,WORK_ROLL_SPEED,NOM_POSTE";
+		String request = "ID,LP,MATID,XTIME,XLOC,ENTHICK,EXTHICK,ENTENS,EXTENS,ROLLFORCE,FSLIP,DAIAMETER,"
+				+ "ROLLED_LENGTH_FOR_WORK_ROLLS,YOUNGMODULUS,BOCKUP_ROLL_DIA,ROLLED_LENGTH_FOR_BACKUP_ROLLS,"
+				+ "MU,TORQUE,AVERAGESIGMA,INPUTERROR,LUBWFLUP,LUBWFLLO,LUBOILFLUP,FLUBOILFLLO,WORK_ROLL_SPEED,NOM_POSTE";
+		
 		
 		try {
 			PreparedStatement preparedStatment = conn.prepareStatement("INSERT INTO FILE_FORMAT("
@@ -143,9 +146,9 @@ private ConnectionBDD (){
 	
 
 	/**
-	 * recupere la derniere donnée entrée dans les capteurs
+	 * recupere la derniere donnée sortie dans les capteurs
 	 */
-	public DonneesSortieCapteurs recupererDerniereDonneeEntreeCapteurs(String nomPoste) {
+	public DonneesSortieCapteurs recupererDerniereDonneeSortieCapteurs(String nomPoste) {
 		DonneesSortieCapteurs DerniereDonneeEntreeCapteurs = null;
 		try {
 			Statement statement = conn.createStatement();

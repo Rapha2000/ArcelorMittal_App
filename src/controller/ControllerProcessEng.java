@@ -68,6 +68,7 @@ public class ControllerProcessEng implements EventHandler<ActionEvent> {
 			final String typeBouton = butt.getText();
 			switch (typeBouton) {
 			case "Logout":
+				System.out.println("coucou");
 				vue.moveToMenu();
 				break;
 			case "Add":
@@ -88,6 +89,8 @@ public class ControllerProcessEng implements EventHandler<ActionEvent> {
 			case "Update":
 				System.out.println("caca"+ id);
 				//ici
+				nomUtilisateur= vue.getUserData();
+				id =  vue.getAdmin();
 				if (dao.utilisateurExiste(nomUtilisateur) ){
 					int newId;
 					System.out.println("caca"+ id);
@@ -101,6 +104,8 @@ public class ControllerProcessEng implements EventHandler<ActionEvent> {
 				}
 				break;
 			case "Remove":
+				nomUtilisateur= vue.getUserData();
+				id =  vue.getAdmin();
 				if (dao.utilisateurExiste(nomUtilisateur)) {
 					dao.supprimerUtilisateur(nomUtilisateur);
 					vue.closeStageProcessEng();

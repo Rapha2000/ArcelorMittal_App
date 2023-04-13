@@ -2,16 +2,13 @@
  * 
  */
 /**
- * @author guill
+ * @author andes
  *
  */
-module Orowan {
+module arcelor_mittal {
+	requires java.sql;
+	requires java.desktop;
 	requires javafx.controls;
 	requires javafx.graphics;
-	requires javafx.base;
-	requires java.desktop;
-	requires java.sql;
-	
-	opens view to javafx.graphics, javafx.fxml;
-	
+	exports view;
 }
