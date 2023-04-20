@@ -1,470 +1,202 @@
 package model;
 
-import java.sql.SQLException;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.ModuleLayer.Controller;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.StringTokenizer;
-import java.io.FileWriter;
-import java.io.IOException;
 
-//import org.h2.store.Data;
-
-import java.sql.ResultSet;
-
-import controller.ConnectionBDD;
-import controller.ControllerWorker;
-import donnees.Csv_input_data;
-import donnees.Csv_output_data;
-import donnees.DonneesSortieCapteurs;
-import donnees.Table_donnees_affichage;
-
-public class Model {
-
-	private String cheminFichierSortieCapteurs;
-	private String nomFichierSortieCapteurs;
-	private Csv_input_data data;
-	private static Model monModele = null;
-	private String nomPoste;
+public class Model implements java.beans.PropertyChangeListener{
 	private PropertyChangeSupport pcs;
-	private ConnectionBDD maBdd;
-	private LinkedList<Table_donnees_affichage> linkedListAffichage;
+	private ArrayList<Simulation> simulation;
+	private static Model notreModele;
+	private ArrayList<Orowan> listeOro;
 	
-	/*
-	 * Constructeur
+	/**
+	 * Constructeur de la classe Model qui instancie la simulation ainsi que le module Orowan.
+	 *
+	 * @param aucun paramètre n'est requis pour cette méthode.
 	 */
-	private Model(String nomFichier, String nomPoste) {
-		cheminFichierSortieCapteurs = "C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/Krakov/";
-		this.nomFichierSortieCapteurs = nomFichier;
+	private Model() {
 		pcs = new PropertyChangeSupport(this);
-		this.nomPoste = nomPoste;
+		simulation = new ArrayList<>();
+	    simulation.add(new Simulation("1939351_F2.txt"));
+		simulation.add(new Simulation("1939351_F3.txt"));
+		listeOro = new ArrayList<>();
+		listeOro.add(new Orowan("1939351_F2.txt"));
+		listeOro.add(new Orowan("1939351_F3.txt"));
+		listeOro.get(0).addPropertyChangeListener(this);
+		listeOro.get(1).addPropertyChangeListener(this);
 	}
 	
+
 	
-	
-
-	public static Model getModel(String nomFichier, String nomPoste) {
-		if (monModele == null){
-			monModele = new Model(nomFichier, nomPoste);
-		}
-		return monModele;
-	}
-
-
-
-
-	/*
-	 * Cette méthode a pour but de lire les valeurs contenues dans les fichiers de sortie des capteurs et de les stocker dans 
-	 * la BDD en utilisant la méthode insererDonneeSortieCapteur(DonneesSortieCapteurs outputDataCapteur) du controller
+	/**
+	 * Démarre la simulation en lançant les threads associés aux objets de la classe Simulation et Orowan.
+	 * Cette méthode appelle la méthode start() pour chacun des objets de la liste simulation et orowan,
+	 * ce qui permet d'exécuter les tâches correspondantes dans des threads séparés et simultanément.
+	 * La méthode affiche également un message de démarrage sur la sortie standard.
 	 * 
+	 *@throws IllegalStateException si la simulation n'a pas été correctement initialisée.
+	 *
 	 */
-	public void read_csv() {
-		File file = new File(cheminFichierSortieCapteurs);
-		
-		// Scanner utiliser pour lire les données du fichier avec les données capteurs
-				Scanner scan;
-				
-				try {
-					scan = new Scanner(file);
-					
-					while (scan.hasNextLine()) {
-					
-						// lire une ligne du fichier csv et stocker les données dans un tableau 'csv_line'
-			            String line = scan.nextLine();
-			            StringTokenizer tokenizer = new StringTokenizer(line, ";");
-			            String[] csv_line = new String[24];
-			            
-			            int i = 0;
-			            while (tokenizer.hasMoreTokens()) {
-			                csv_line[i++] = tokenizer.nextToken();
-			            }
-			            
-			            // toutes les données stockées sont des String, on les convertit en double
-			            double[] data = new double[csv_line.length];
-			            
-			            // la méthode insererDonneeSortieCapteur du controller prend en entrée un argument de type 
-			            // 'DonneesSortieCapteurs' (cf data_types)
-			            DonneesSortieCapteurs donneesCapteur = new DonneesSortieCapteurs(
-			            		(int) data[0], (int) data[1], data[2], data[3], data[4], data[5], 
-			            		data[6], data[7], data[8], data[9], data[10], data[11], data[12], 
-			            		data[13], data[14], data[15], data[16], data[17], data[18], data[19],
-								data[20], data[21], data[22], data[23], nomFichierSortieCapteurs);
-			            
-			            // Les données sont maintenant au bon format, on peut donc les stocker dans la bdd H2
-			            maBdd.insererDonneeSortieCapteur(donneesCapteur);
-					}
-	
-				} catch(FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-					
-	}
-	
-	public Csv_input_data convertir_les_donnees_capteurs_en_donnees_pour_Orowan(DonneesSortieCapteurs donneesCapteur){
-		
-		// Sélection des données utiles à Orowan
-	    double he = donneesCapteur.getEnThick();
-	    double hs = donneesCapteur.getExThick();
-	    double te = donneesCapteur.getEnTens();
-	    double ts = donneesCapteur.getExTens();
-	    double diamWR = donneesCapteur.getDaiameter();
-	    double wRYoung = donneesCapteur.getYoungModulus();
-	    double mu_ini = donneesCapteur.getMu();
-	    double force = donneesCapteur.getRollForce();
-	    double g = donneesCapteur.getAverageSigma();
-	    String nomPoste = donneesCapteur.getNomPoste();
-	    
-	    // Création d'un objet "Csv_input_data" avec les données sélectionnées
-	    Csv_input_data donneesEntreeOrowan = new Csv_input_data(1, he, hs, te, ts, diamWR, wRYoung, 0, mu_ini, force, g, nomPoste);
-	    
-	    return donneesEntreeOrowan;
-	}
-	
-	
-	public boolean transformerCsv_input_data_en_fichierCSVEntreeOrowan(Csv_input_data data) {
-		try {
-			FileWriter myWriter = new FileWriter("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste);
-			myWriter.write("Cas	He	Hs	Te	Ts	Diam_WR	WRyoung	offset ini	mu_ini	Force	G\n");
-			myWriter.write(data.toStringnoNomPoste().replace(',', '\t'));
-			myWriter.close();
-		} catch (Exception e) {
-			return true;
-		}
-		return false; // success
-	}
-	
-	
-	public void runOrowan (Csv_input_data inOrowan) throws IOException, InterruptedException {
-		long start = System.currentTimeMillis();
-		String cmd = "C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/Model/Orowan_x64.exe.exe"; // la commande à exec
 
-		ProcessBuilder processBuilder = new ProcessBuilder(cmd); // Prépare le lancement de CMD avec la ma commande
-
-		Process process = processBuilder.start(); // lance le process
-
-		DataOutputStream writer = new DataOutputStream(process.getOutputStream()); // on setup l'ecriture et la lecture
-																					// de l'invite de commande
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-		// Démarche a suivre d'après le PDF
-		try {
-			// System.out.println("i\n");
-			writer.writeBytes("i\n");
-			writer.flush();
-
-			// System.out.println("c\n");
-			writer.writeBytes("c\n");
-			writer.flush();
-
-			// System.out.println("./Rugo/Ressources/orowan/inv_cst.txt\n");
-			writer.writeBytes("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste + "\n");
-			writer.flush();
-
-			// System.out.println("./Rugo/Ressources/orowan/output.txt\n");
-			writer.writeBytes("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste + "\n");
-			writer.flush();
-
-			process.waitFor();
-			pcs.firePropertyChange("OrowanComputeTime", nomPoste, System.currentTimeMillis() - start);
-
-			process.destroy();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	
-	// Stocker les données de sortie d'Orowan dans la bdd
-	public Csv_output_data readCsvDonneeSortieOrowan(){
-		BufferedReader br = null;
-		Csv_output_data donneeOutOrowan = null;
-
-		try {
-			String sCurrentLine;
-			br = new BufferedReader(new FileReader("C:/Users/guill/OneDrive/Documents/2A/S8/Projet Génie Logiciel/Fichiers/Fichiers/sortieOrowan/" + nomPoste));// file name with
-																									// path
-			int flagFirstLine = 1;
-			while ((sCurrentLine = br.readLine()) != null) {
-				if (flagFirstLine == 1) {
-					flagFirstLine = 0;
-				} else {
-					String[] lineOfData = sCurrentLine.split("\t");
-
-					NumberFormat format = NumberFormat.getInstance();
-
-					try {
-						donneeOutOrowan = new Csv_output_data(nomPoste, format.parse(lineOfData[0]).intValue(), lineOfData[1],
-								format.parse(lineOfData[2]).doubleValue(), format.parse(lineOfData[3]).doubleValue(),
-								format.parse(lineOfData[4]).doubleValue(), format.parse(lineOfData[5]).doubleValue(),
-								format.parse(lineOfData[6]).doubleValue(), format.parse(lineOfData[7]).doubleValue(),
-								format.parse(lineOfData[8]).doubleValue(), format.parse(lineOfData[9]).doubleValue(),
-								format.parse(lineOfData[10]).doubleValue(), lineOfData[11]);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-		// System.out.println(donneeOutOrowan.toString());
-		return donneeOutOrowan;
-	}
-	
-	public Table_donnees_affichage selectionnerDonneesAffichages() {
-		ArrayList<Table_donnees_affichage> uniqueList = new ArrayList<>();
-		while (linkedListAffichage.size() != 0) {
-			Table_donnees_affichage tester = linkedListAffichage.pop();
-			if (!linkedListAffichage.contains(tester) && !uniqueList.contains(tester)) {
-				uniqueList.add(tester);
-			}
-		}
-		// System.out.println(uniqueList.size());
-		double sigma = 0;
-		double rollSpeed = 0;
-		double friction = 0;
-		int nbrUnique = 0;
-		String error = "VOID";
-		Table_donnees_affichage donneeAffichage;
-		// System.out.println(uniqueList.toString());
-		for (Table_donnees_affichage mAffichage : uniqueList) {
-			if (mAffichage.getErreur().equals("VOID")) {
-				sigma += mAffichage.getSigma();
-				friction += mAffichage.getFriction();
-				nbrUnique++;
-			} else
-				error = mAffichage.getErreur();
-			rollSpeed += mAffichage.getRolling_speed();
-		}
-		if (nbrUnique == 0)
-			nbrUnique = 1;
-		sigma /= nbrUnique;
-		friction /= nbrUnique;
-		donneeAffichage = new Table_donnees_affichage(rollSpeed / uniqueList.size(), sigma, friction,
-				uniqueList.get(0).getNomPoste(), error);
-		// System.out.println(donneeAffichage.toString());
-		pcs.firePropertyChange("newData", null, null);
-		return (donneeAffichage);
+	public void launchSim() {
+		simulation.get(0).start(); 
+		simulation.get(1).start(); 
+		listeOro.get(0).start();
+		listeOro.get(1).start();
 	}
 	
 	/**
-	 * Lance le thread de la simulation
+	 * Renvoie une liste de noms de postes de travail associés à chaque objet Orowan de la liste orowan.
+	 * Cette méthode parcourt la liste orowan pour récupérer le nom de poste de travail de chacun des 
+	 * objets Orowan à l'aide de la méthode getNomPoste(), puis stocke ces noms dans une nouvelle liste 
+	 * nomPostes.
+	 *
+	 * @return une liste de noms de postes de travail associés à chaque objet Orowan de la liste orowan.
+	 * @throws IllegalStateException si la simulation n'a pas été correctement initialisée.
 	 */
-	/*public void startSimulation() {
-		System.out.println("starting Threads");
-		textFileHandler.get(0).start(); // Reset les tables et lance le remplissage de la bdd
-		textFileHandler.get(1).start(); // Reset les tables et lance le remplissage de la bdd
-		orowan.get(0).start();
-		orowan.get(1).start();
-	}*/
-	
-	
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		this.pcs.addPropertyChangeListener(listener);
+
+	public ArrayList<String> getNomsDePostes(){
+		// Crée une nouvelle liste vide pour stocker les noms de postes.
+		ArrayList<String> standList = new ArrayList<>();
 		
+		// Itère à travers la liste d'objets "Oro" pour extraire le nom de poste de chaque objet.
+		for(int i = 0; i < listeOro.size(); i++) {
+			standList.add(listeOro.get(i).getStand());
+		}
+		
+		// Renvoie la liste de noms de postes extraits.
+		return standList;
 	}
 
 
-
 	
 	
-
-	public String getNomPoste() {
-		return nomPoste;
+	/**
+	 * Cette méthode arrête la simulation et termine toutes les threads en cours d'exécution.
+	 * Elle réinitialise les tables et commence à remplir la BDD. Ensuite, elle
+	 * attend la fin de toutes les threads et les recrée.
+	 * 
+    */
+	public void arreterSimulation() {
+		// Interrompt les threads de simulation et Oro.
+		simulation.get(0).setInterrompu();
+		simulation.get(1).setInterrompu(); 
+		listeOro.get(0).setInterrompu();
+		listeOro.get(1).setInterrompu();
+		
+		try {
+			// Attends que les threads de simulation et Oro se terminent.
+			simulation.get(0).join();
+			simulation.get(1).join();
+			listeOro.get(0).join();
+			listeOro.get(1).join();
+			
+			// Redémarre les threads.
+			relancerThread();
+		} catch (InterruptedException e) {
+			// Gère l'exception si une interruption se produit.
+			e.printStackTrace();
+		}
 	}
 
+
+	/**
+	 * Cette méthode recrée les threads pour la simulation et la méthode Orowan en initialisant des 
+	 * nouvelles instances.
+	 * Elle réinitialise également les PropertyChangeListeners pour les objets Orowan.
+	 *
+    */
+	private void relancerThread() {
+		// Crée de nouveaux threads de simulation et Oro avec des fichiers différents.
+		simulation = new ArrayList<>();
+		simulation.add(new Simulation("1939351_F2.txt"));
+		simulation.add(new Simulation("1939351_F3.txt"));
+		listeOro = new ArrayList<>();
+		listeOro.add(new Orowan("1939351_F2.txt"));
+		listeOro.add(new Orowan("1939351_F3.txt"));
+		
+		// Ajoute le listener de changement de propriété pour les objets Oro.
+		listeOro.get(0).addPropertyChangeListener(this);
+		listeOro.get(1).addPropertyChangeListener(this);
+}
+
+	/**
+	 * Méthode statique qui permet de récupérer l'instance unique de la classe Model.
+	 * Si l'instance n'a pas encore été créée, elle est créée lors de l'appel de cette méthode.
+	 * Cette méthode suit le patron de conception Singleton, qui garantit qu'il n'existe qu'une 
+	 * seule instance de la classe Model dans l'application.
+	 *
+	 * @return l'instance unique de la classe Model.
+	 */
+
+	public static Model getInstance() {
+		if (notreModele == null) {
+			notreModele = new Model();
+		}
+		return notreModele;
+	}
 	
+	/**
+	 * Ajoute un écouteur de changement de propriété à la liste des écouteurs de changement de propriété 
+	 * de l'objet courant.
+	 * 
+	 * @param listener l'objet qui implémente l'interface PropertyChangeListener et doit être ajouté à la 
+	 *                 liste des écouteurs de changement de propriété de l'objet courant.
+	 * @throws NullPointerException si l'objet listener est nul.
+	 */
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.pcs.addPropertyChangeListener(listener);
+    }
+	
+	/**
+	 * Supprime un écouteur de changement de propriété de la liste des écouteurs de changement de 
+	 * propriété de l'objet courant.
+	 *
+	 * @param listener l'objet qui implémente l'interface PropertyChangeListener et doit être supprimé de la liste des
+	 *                 écouteurs de changement de propriété de l'objet courant.
+	 * @throws NullPointerException si l'objet listener est nul.
+	 */
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+        this.pcs.removePropertyChangeListener(listener);
+    }
+	
+	/**
+	 * Implémentation de la méthode propertyChange de l'interface PropertyChangeListener.
+	 * Cette méthode est appelée lorsqu'un événement de changement de propriété est détecté.
+	 * En fonction du nom de la propriété modifiée, cette méthode déclenche un événement de changement 
+	 * de propriété approprié sur l'objet courant de la classe Model.
+	 * Si la propriété modifiée est "newData", un événement de changement de propriété est déclenché 
+	 * pour indiquer que de nouvelles données ont été calculées par le module Orowan.
+	 * Si la propriété modifiée est "OrowanComputeTime", un événement de changement de propriété est 
+	 * déclenché pour indiquer le temps de calcul du module Orowan pour le poste de travail correspondant.
+	 *
+	 * @param evt l'événement de changement de propriété émis par l'objet Orowan.
+	 * @throws NullPointerException si l'objet evt est nul.
+	 */
+
+	public void propertyChange(PropertyChangeEvent evt) {
+		// Récupère le nom de la propriété modifiée.
+		String propName = evt.getPropertyName();
+		
+		// Réagit en fonction de la propriété modifiée.
+		switch (propName) {
+		case "changementDonnee":
+			// Informe les listeners qu'une donnée a été modifiée.
+			pcs.firePropertyChange("changementDonnee", null, null);
+			break;
+		case "tempsOrowan" :
+			// Informe les listeners que le temps de simulation Oro a été modifié.
+			pcs.firePropertyChange("tempsOrowan", evt.getOldValue(), evt.getNewValue());
+			break;
+		default:
+			break;
+		}
+	}
+
+
 	
 }
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-/**	
-	
-	
-	
-	public static void donneesCapteurs_to_inputOrowan() {
-		BufferedReader reader = new BufferedReader(new FileReader(cheminFichierSortieCapteurs));
-        FileWriter writer = new FileWriter(outputFile);
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String[] columns = line.split(",");
-            if (columns.length >= 4) {
-                writer.write(columns[1] + "," + columns[3] + "\n");
-            }
-        }
-        reader.close();
-        writer.close();
-    }
-    
-**/	
-	
-	/*
-	 * Cette méthode extrait les données utiles à Orowan depuis les données de sorties de capteurs que l'on a inséré
-	 * précédemment dans la bdd. Elle effectue cette extraction toutes les 200 ms en utilisant un thread et la commande 
-	 * wait. 
-	 * 
-	 */
-	/**
-	public Csv_input_data extract_data() {
-		Thread thread = new Thread(new Runnable() {
-		String nomPoste;
-			public void run() {
-				while(true) {
-					try {
-                        data = maBdd.recupererDerniereDonneeEntreeOrowan(nomPoste); // on extrait uniquement les valeurs utiles à Orowan
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-				}
-			}
-		});
-		thread.start();
-		
-		return data;
-	}
-	
-	
-	
-	/*
-	 * 
-	 * cette méthode exécute "Orowan" avec les données que l'on a récupéré avec la méthode extract_data,
-	 * et stocke les valeurs de sortie d'Orowan dans une liste.
-	 * 
-	 * Cette méthode retourne une liste où chaque élément correspond au fichier de sortie d'Orowan pour une ligne correspondante
-	 * 
-	 */
-	/**
-	public Csv_output_data execute_orowan(Csv_input_data data) {
-		File exeFile = new File("C:/Users/rapha/OneDrive/Ecole/01 - Cours/S8/04 - Ingénierie logicielle/03 - Projet/workspace/Fichiers/Model/Orowan_x64.exe");
-		
-	    // List<String> outputOrowanList = new ArrayList<>(); // Nouvelle liste pour stocker les sorties de Orowan
-	    
-	
-	        // exécution de Orowan
-	        try {
-	            // création d'un processus pour exécuter Orowan
-	            ProcessBuilder processBuilder = new ProcessBuilder("Orowan", data.toString());
-	            processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT); // redirection de la sortie vers le flux standard
-	            Process process = processBuilder.start();
-	            int exitCode = process.waitFor(); // attente de la fin de l'exécution de Orowan
-	            
-	            if (exitCode == 0) {
-	                // lecture du fichier de sortie de Orowan
-	                String outputFilePath = "output_" + data.getId() + ".csv"; // nom de fichier généré par Orowan
-	                List<String> outputLines = Files.readAllLines(Paths.get(outputFilePath));
-	                String output = String.join(",", outputLines);
-	           
-	                
-	                // stockage dans la base de données
-	                //maBdd.storeOrowanOutput(data.getId(), output);
-	            } else {
-	                System.err.println("Erreur lors de l'exécution de Orowan pour la donnée " + data.getId());
-	            }
-	        } catch (IOException | InterruptedException | SQLException e) {
-	            e.printStackTrace();
-	        }
-	        insererDonneeSortieOrowan(output);
-	   }
-	
-	
-
-	    **/
-	   
-	
-	
-	/*
-	 * prend 5 valeurs et calcule la moyenne des coefficient de frictions et les stocke dans une liste 
-	 * 
-	 */
-	/**
-	public void calculeMoyennesParametres(){
-		
-		Double averageCoeffFriction = new ArrayList<>(); // liste pour stocker les moyennes de coefficients de friction
-		Double averageSigma = new ArrayList<>(); // liste pour stocker les moyennes de coefficients de friction
-		Double averageRollingSpeed = new ArrayList<>(); // liste pour stocker les moyennes de coefficients de friction
-	    List<Double> currentCoeffFriction = new ArrayList<>(); // liste pour stocker les coefficients de friction courants
-	    List<Double> currentSigma = new ArrayList<>(); // liste pour stocker les coefficients de friction courants
-	    List<Double> currentRollingSpeed = new ArrayList<>(); // liste pour stocker les coefficients de friction courants
-	    
-	    for (int i=0;i<5;i++) {
-			currentCoeffFriction.append(ConnectionBDD.recupererDerniereDonnesSortieOrowan().get(0));
-	     	currentSigma.append(ConnectionBDD.recupererDerniereDonnesSortieOrowan().get(1));
-			currentRollingSpeed.append(ConnectionBDD.recupererDerniereDonnesSortieOrowan().get(2));
-	    }
-	    
-	    
-	    int sumCoeffFriction = 0;
-        for (int i=0; i < currentCoeffFriction.size(); i++) {
-            sumCoeffFriction += currentCoeffFriction.get(i);
-        }
-        
-        averageCoeffFriction = (double) (sumCoeffFriction / currentCoeffFriction.size());
-        
-        int sumSigma = 0;
-        for (int i=0; i < currentSigma.size(); i++) {
-            sumSigma += currentSigma.get(i);
-        }
-        
-        averageSigma = (double) (sumSigma / currentSigma.size());
-        
-        int sumRollingSpeed = 0;
-        for (int i=0; i < currentRollingSpeed.size(); i++) {
-            sumRollingSpeed += currentRollingSpeed.get(i);
-        }
-        
-        averageRollingSpeed = (double) (sumRollingSpeed / currentRollingSpeed.size());
-        
-
-		Table_donnees_affichage donneeAffichage = new Table_donnees_affichage(averageRollingSpeed, averageSigma, averageCoeffFriction, nomPoste);
-	  
-		maBdd.insertionDonneeAffichage(donneeAffichage);
-	    
-	  
-	    
-	        
-	}
-**/
-
-
