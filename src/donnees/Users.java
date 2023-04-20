@@ -1,5 +1,8 @@
 package donnees;
 
+
+/** Cette classe représente les utilisateurs du logiciel **/
+
 public class Users {
 
 	private int id ;
